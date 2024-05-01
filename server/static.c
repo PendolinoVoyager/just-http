@@ -1,7 +1,7 @@
+#include "static.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-
 char *preload_static(char *file) {
     FILE *st_file = fopen(file, "r");
     if (st_file == NULL) 
@@ -36,4 +36,22 @@ char *dbg_large_res() {
         *ptr++ = 'A';
     }
     return large;
+}
+int read_static(char *file, char *buff) {
+    int bytes_read = 0;
+    char *buff_p = buff;
+    FILE *f = fopen(file, "r");
+    while((bytes_read = fread(buff_p, sizeof(char), CHUNK_SIZE, f)) > 0) {
+        printf("%s\n",buff);
+        buff_p += bytes_read; 
+    }
+    if (bytes_read == -1) {
+        perror("static read");
+        return -1;
+    }
+    if (bytes_read == sizeof(buff)) {
+        write(stdout, "STATIC BUFFER TOO SMALL\n", 32);
+        return 1;
+    }
+    return 0;
 }
